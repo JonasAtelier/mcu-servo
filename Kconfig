@@ -1,0 +1,39 @@
+# Read by ESP-IDF as a component Kconfig, and by both forges' `make menu`
+# (scripts/menu.py) for the SERVO_<BACKEND> prompts. stm-forge has no Kconfig
+# build step: its build only sees the defconfig lines, as
+# -DCONFIG_SERVO_<BACKEND>=1 or 0. Every backend is off unless set.
+menuconfig SERVO
+    bool "Hobby RC servo subsystem"
+    default y
+    help
+        Hobby RC servos commanded by pulse width. The core: struct
+        servo_dev, its calibration and servo_set_angle(). Pick the
+        backends you need below; none is built by default.
+
+if SERVO
+
+    config SERVO_PWM
+        bool "The MCU's own PWM (ESP32 LEDC, STM32 TIM)"
+        default n
+        help
+            Build the PWM backend: servo_pwm_init() and friends, one servo
+            per LEDC channel on ESP-IDF or per TIM channel on the STM32 HAL
+            (needs HAL_TIM_MODULE_ENABLED).
+
+    config SERVO_PCA9685
+        bool "NXP PCA9685 16-channel PWM over I2C"
+        default n
+        help
+            Build the PCA9685 driver: esp-pca9685-pwm's pca9685_*() calls,
+            also as a plain PWM or LED driver, and pca9685_servo() for each
+            output as a servo. On the STM32 HAL it needs
+            HAL_I2C_MODULE_ENABLED.
+
+    config SERVO_DEBUG
+        bool "servo_dbg() lines"
+        default n
+        help
+            STM32 HAL only: compile servo_dbg() lines in. On ESP-IDF
+            servo_dbg() is ESP_LOGD and the log level decides.
+
+endif # SERVO
