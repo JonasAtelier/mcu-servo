@@ -27,17 +27,17 @@ forge package key are `servo`.
 > **Hardware unverified.** Host tests use a fake LEDC, a fake TIM, a fake
 > I2C bus and a register-level fake PCA9685. Nothing here has moved a servo.
 
-[Supported hardware](#supported-hardware) · [Install](#install) ·
+[Supported hardware](#supported-hardware) · [Drivers](#drivers) ·
+[Install](#install) ·
 [Quick start](#quick-start) · [Examples](#examples) ·
 [Documentation](#documentation) · [Tests](#tests) · [License](#license)
 
 ## Supported hardware
 
-| Backend | Platform | Outputs | Pulse resolution | Option |
-|---|---|---|---|---|
-| **MCU PWM** | ESP-IDF: LEDC, low-speed mode | one servo per channel | 14-bit duty: 1.22 us at 50 Hz | `SERVO_PWM` |
-| | STM32 HAL: TIM, PWM mode 1 | one servo per channel | one counter tick | `SERVO_PWM` |
-| **NXP PCA9685** | both, over I2C | 16, at one shared rate | 12-bit: 4.88 us at 50 Hz | `SERVO_PCA9685` |
+| Backend | Bus | Notes |
+|---|---|---|
+| **MCU PWM** | on-chip PWM | the MCU's own PWM timers |
+| **NXP PCA9685** | I2C | NXP 16-channel PWM driver |
 
 **No servo figures.** No published standard fixes which pulse is which
 angle, so this library ships none: the app measures each servo and gives
@@ -45,6 +45,46 @@ its calibration, and a servo with no calibration refuses to move. Every
 PCA9685 value is cited to NXP's datasheet in the
 [backend reference](docs/chips.md); wiring and power are in the
 [hardware guide](docs/hardware.md).
+
+## Drivers
+
+<details><summary><b>MCU PWM</b> — on-chip PWM</summary>
+
+- Platform: ESP-IDF: LEDC, low-speed mode
+  - Outputs: one servo per channel
+  - Pulse resolution: 14-bit duty: 1.22 us at 50 Hz
+  - Option: `SERVO_PWM`
+- Platform: STM32 HAL: TIM, PWM mode 1
+  - Outputs: one servo per channel
+  - Pulse resolution: one counter tick
+  - Option: `SERVO_PWM`
+- Examples: ESP-IDF [pwm](examples/esp/pwm/), one servo swept on LEDC · STM32
+  HAL [pwm](examples/stm/pwm/main.c), two on TIM3
+- **Servos on one LEDC timer share one rate.** The first servo on a timer
+  configures it; later ones at that rate leave it running, and one at
+  another rate is `-EBUSY` -- also once every servo on it is deleted, as
+  the timer keeps running. See [usage](docs/usage.md#the-pwm-backend).
+- Chip reference: [ESP-IDF LEDC](docs/chips.md#esp-idf-ledc)
+- Chip reference: [STM32 HAL TIM](docs/chips.md#stm32-hal-tim)
+
+</details>
+
+<details><summary><b>NXP PCA9685</b> — I2C</summary>
+
+- Platform: both, over I2C
+- Outputs: 16, at one shared rate
+- Pulse resolution: 12-bit: 4.88 us at 50 Hz
+- Option: `SERVO_PCA9685`
+- Examples: ESP-IDF [pca9685](examples/esp/pca9685/), four servos and an LED ·
+  STM32 HAL [pca9685](examples/stm/pca9685/main.c), twelve servos and an LED
+- **The PCA9685's sixteen outputs share one rate.** After
+  `pca9685_set_frequency()`, move every servo again.
+- **EXTCLK is never selected.** `ext_clock_hz` is the oscillator frequency
+  used in the arithmetic (for instance a measured internal oscillator), as
+  in esp-pca9685-pwm; see [the backend reference](docs/chips.md#nxp-pca9685).
+- Chip reference: [NXP PCA9685](docs/chips.md#nxp-pca9685)
+
+</details>
 
 ## Install
 
@@ -119,10 +159,7 @@ servo_stop(hip);                        /* no pulses: the servo goes slack */
 
 ## Examples
 
-| Backend | ESP-IDF | STM32 HAL |
-|---|---|---|
-| MCU PWM | [pwm](examples/esp/pwm/), one servo swept on LEDC | [pwm](examples/stm/pwm/main.c), two on TIM3 |
-| PCA9685 | [pca9685](examples/esp/pca9685/), four servos and an LED | [pca9685](examples/stm/pca9685/main.c), twelve servos and an LED |
+Each driver's examples are listed under [Drivers](#drivers).
 
 The calibration in every example is a placeholder, not any servo's figures:
 replace it with yours before the first run. ESP-IDF examples find this
@@ -139,15 +176,6 @@ STM32 examples are snippets to integrate into your application.
 
 ## Scope and limitations
 
-- **Servos on one LEDC timer share one rate.** The first servo on a timer
-  configures it; later ones at that rate leave it running, and one at
-  another rate is `-EBUSY` -- also once every servo on it is deleted, as
-  the timer keeps running. See [usage](docs/usage.md#the-pwm-backend).
-- **The PCA9685's sixteen outputs share one rate.** After
-  `pca9685_set_frequency()`, move every servo again.
-- **EXTCLK is never selected.** `ext_clock_hz` is the oscillator frequency
-  used in the arithmetic (for instance a measured internal oscillator), as
-  in esp-pca9685-pwm; see [the backend reference](docs/chips.md#nxp-pca9685).
 - **No locks.** One task per servo, or your own mutex; one task per
   PCA9685.
 
