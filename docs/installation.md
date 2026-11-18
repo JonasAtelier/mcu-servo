@@ -20,6 +20,9 @@ over I2C, which says what it found when it starts; for servos on the MCU's
 own PWM, turn on `SERVO_PWM` instead and start from its example in
 `examples/esp/pwm` or `examples/stm/pwm`. The reference follows the guides.
 
+**Arduino is not supported yet.** TODO: make the library usable from
+Arduino (Arduino IDE and PlatformIO).
+
 ## ESP-IDF, step by step
 
 **You need** ESP-IDF 5.2 or newer, with `idf.py` working in your terminal, and
