@@ -33,7 +33,8 @@ examples/
   esp/<name>/               ESP-IDF projects: pwm, pca9685
   stm/<name>/               STM32 snippets: pwm, pca9685
 docs/                       the five guides; the datasheet here is gitignored
-CMakeLists.txt              ESP-IDF only; stm-forge globs src/**/*.c instead
+CMakeLists.txt              ESP-IDF component; elsewhere a static library for add_subdirectory(); stm-forge globs src/**/*.c instead
+                            the static library's options are Kconfig's bool entries, found by the type line directly under each `config`
 Kconfig                     SERVO and SERVO_<BACKEND>, for ESP-IDF and both forges' menus
 idf_component.yml           ESP-IDF component manifest
 LICENSE                     MIT
@@ -115,7 +116,8 @@ MCU's PWM is outside the bus layer, on the output port.
 3. Cite every register and timing to its datasheet in `src/foo/foo_regs.h`,
    and hold the arithmetic in a `test_foo_math.c`.
 4. Add `CONFIG_SERVO_FOO` to:
-   - the no-backend checks in `CMakeLists.txt` and `src/servo_port_stm.c`;
+   - the no-backend checks in `CMakeLists.txt` (its ESP-IDF part; the
+     `add_subdirectory()` part reads `Kconfig`) and `src/servo_port_stm.c`;
    - a HAL module `#error` in `src/servo_priv.h`, if it needs one;
    - its sources in `CMakeLists.txt`;
    - `Kconfig`;

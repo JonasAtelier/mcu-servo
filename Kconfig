@@ -2,6 +2,8 @@
 # (scripts/menu.py) for the SERVO_<BACKEND> prompts. stm-forge has no Kconfig
 # build step: its build only sees the defconfig lines, as
 # -DCONFIG_SERVO_<BACKEND>=1 or 0. Every backend is off unless set.
+# Outside ESP-IDF, CMakeLists.txt takes its options from the bool entries
+# here, found by their type line: keep `bool` directly under each `config`.
 menuconfig SERVO
     bool "Hobby RC servo subsystem"
     default y

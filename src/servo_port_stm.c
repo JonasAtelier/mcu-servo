@@ -12,12 +12,13 @@
 
 /*
  * The core is always built; each backend only under its own option. With
- * the library on and no backend picked, say so -- stm-forge compiles this
- * file only when PKG_servo = y, so this is the CMakeLists' "on, no backend"
- * warning on the ESP-IDF side.
+ * the library built and no backend picked, say so: this file is compiled
+ * only when the library is, so this is the CMakeLists' "no backend" warning
+ * for every build that never reads that file (stm-forge, a hand-made
+ * project).
  */
 #if !(CONFIG_SERVO_PWM || CONFIG_SERVO_PCA9685)
-#warning "servo: no backend is selected; set SERVO_PWM = y or SERVO_PCA9685 = y under PKG_servo = y (or -DCONFIG_SERVO_<BACKEND>=1)"
+#warning "servo: no backend is selected; define CONFIG_SERVO_<BACKEND>=1 (stm-forge: SERVO_<BACKEND> = y)"
 #endif
 
 #if defined(HAL_I2C_MODULE_ENABLED) || defined(HAL_SPI_MODULE_ENABLED) || \
