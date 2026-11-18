@@ -1,1 +1,1 @@
-idf_component_register(SRCS "main.c" REQUIRES servo driver)
+idf_component_register(SRCS "main.c")
