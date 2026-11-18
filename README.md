@@ -33,6 +33,10 @@ The example centres the servo, sweeps its calibrated range, then stops the pulse
 
 ## Drivers and examples
 
+![In the PWM example calibration, 0°, 30° and 60° map to 1,250, 1,500 and 1,750 microseconds. Requests beyond the angle range clamp to its endpoints.](docs/angle-to-pulse.png)
+
+These values come from the [PWM example](examples/esp/pwm/main/main.c). Measure your own servo’s travel and pulse limits before running it.
+
 Both outputs accept the same calibrated angle or pulse width. Use the PCA9685 header when you also need a channel for a general-purpose PWM output. [Angle and pulse API](include/servo.h)
 
 | Output | Driver header | ESP-IDF project | STM32 HAL example |
