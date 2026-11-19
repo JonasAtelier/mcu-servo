@@ -54,6 +54,6 @@ To run the simulated tests on your computer, run `make -C test test` from the li
 
 ## License
 
-[MIT](LICENSE).
+© 2026 JonasAtelier, [GPL-3.0-only](LICENSE).
 
 [Browse the workshop catalog · ESP32 and STM32 drivers](https://github.com/JonasAtelier/jonas-atelier-libraries#esp32-and-stm32-drivers)
