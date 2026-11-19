@@ -37,7 +37,7 @@ CMakeLists.txt              ESP-IDF component; elsewhere a static library for ad
                             the static library's options are Kconfig's bool entries, found by the type line directly under each `config`
 Kconfig                     SERVO and SERVO_<BACKEND>, for ESP-IDF and both forges' menus
 idf_component.yml           ESP-IDF component manifest
-LICENSE                     MIT
+LICENSE                     GPL-3.0-only
 ```
 
 Naming inside `src/<backend>/`, the same in every category library:
